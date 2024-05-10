@@ -1,0 +1,689 @@
+<div class="main-container">
+  <div class="top-bar">
+    <div class="info">
+      <span class="title-txt">List of Projects</span>
+      <button
+        type="button"
+        class="btn text-white create-btn"
+        data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop"
+        (click)="requiredData()"
+      >
+        <i class="bi bi-sliders"></i>
+        Create Project
+      </button>
+    </div>
+    <div class="input-group">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search for a Project"
+        [(ngModel)]="searchQuery"
+        (input)="searchQueryFire()"
+      />
+    </div>
+  </div>
+  <div class="table mt-3">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <td>Filter by Status :-</td>
+          <td>
+            <select
+              class="form-select form-select-sm"
+              aria-label="Small select example"
+              [(ngModel)]="selectedOption"
+              (ngModelChange)="onFilterChange()"
+            >
+              <option disabled [ngValue]="null">Project Status</option>
+              <option value="COMPLETED">COMPLETED</option>
+              <option value="ONGOING">ONGOING</option>
+              <option value="UPCOMING">UPCOMING</option>
+            </select>
+          </td>
+          <td>
+            <button class="btn btn-success" (click)="clearFilter()">
+              Clear Filter
+            </button>
+          </td>
+
+          <td>Filter by Department :-</td>
+          <td>
+            <select
+              class="form-select form-control form-select-sm"
+              id="department"
+              name="department"
+              aria-label="Small select example"
+              [(ngModel)]="selectedDepartmentOption"
+              (ngModelChange)="onFilterChange()"
+            >
+              <option disabled selected [ngValue]="null">
+                Select department
+              </option>
+              <option *ngFor="let dept of deptData" [value]="dept.name">
+                {{ dept.name }}
+              </option>
+            </select>
+          </td>
+
+          <td>
+            <button class="btn btn-success" (click)="clearDepartmentFilter()">
+              Clear Filter
+            </button>
+          </td>
+        </tr>
+
+        <tr class="header-row">
+          <th scope="col">Sl. No</th>
+          <th scope="col">Project Id</th>
+          <th scope="col">Title</th>
+          <th scope="col">Status</th>
+          <th scope="col">Department</th>
+          <th scope="col">Start Date</th>
+          <th scope="col">End Date</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody *ngFor="let project of projectData; let i = index">
+        <tr>
+          <td>{{ calcSlNo(i + 1) }}</td>
+          <td>{{ project.projectId }}</td>
+          <td>{{ project.projectTitle }}</td>
+          <td>
+            <span
+              class="badge"
+              [ngClass]="{
+                COMPLETED: project.projectStatus === 'COMPLETED',
+                ONGOING: project.projectStatus === 'ONGOING',
+                UPCOMING: project.projectStatus === 'UPCOMING'
+              }"
+              >{{ project.projectStatus }}</span
+            >
+          </td>
+          <td>
+            {{
+              project.department
+                ? (project.department.name | titlecase)
+                : "Not Assigned"
+            }}
+          </td>
+          <td>{{ project.start_date | date : "dd-MM-yyyy" }}</td>
+          <td>{{ project.end_date | date : "dd-MM-yyyy" }}</td>
+          <td class="actions-row">
+            <button
+              type="button"
+              class="btn btn-success viewbtn"
+              (click)="viewProjectEmployees(project)"
+              data-bs-toggle="modal"
+              data-bs-target="#viewProjectBackdrop"
+            >
+              <i class="bi bi-people-fill"></i>
+            </button>
+            <button
+              type="button"
+              class="btn btn-success viewbtn"
+              data-bs-toggle="modal"
+              data-bs-target="#viewModal"
+              (click)="setItem(project)"
+            >
+              <i class="bi bi-pencil-square"></i>
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-danger delbtn"
+              data-bs-toggle="modal"
+              data-bs-target="#deleteModal"
+              (click)="setItem(project)"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <nav
+    class="pagination-container d-flex align-items-baseline gap-5"
+    aria-label="Page navigation example"
+  >
+    <div class="pagination-info">
+      <span>Total Items: {{ totalItems }} </span
+      ><span>Page Size: {{ pageSize }} </span>
+    </div>
+
+    <ul class="pagination d-flex gap-3">
+      <div class="d-flex">
+        <li class="page-item" [class.disabled]="page == 1">
+          <a class="page-link" aria-label="Previous">
+            <span aria-hidden="true" (click)="previousPage()">
+              &laquo; Previous</span
+            >
+          </a>
+        </li>
+        <li class="page-item" *ngFor="let p of pages">
+          <a
+            class="page-link"
+            [ngClass]="{ 'active-page': p === page }"
+            (click)="getCurrPageData(p)"
+            >{{ p }}</a
+          >
+        </li>
+
+        <li class="page-item" [class.disabled]="page === totalPages">
+          <a class="page-link" aria-label="Next">
+            <span aria-hidden="true" (click)="nextPage()">Next &raquo;</span>
+          </a>
+        </li>
+      </div>
+    </ul>
+  </nav>
+</div>
+<!-- Create Project Modal -->
+<form #f="ngForm" (ngSubmit)="submitForm()">
+  <div
+    class="modal fade"
+    id="staticBackdrop"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div
+      class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable static"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">
+            Provide Project Details
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            data-bs-dismiss="modal"
+            (click)="f.reset()"
+          ></button>
+        </div>
+        <div class="error-msg" [hidden]="toggleError">{{ errorMsg }}</div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="projectTitle" class="form-label"
+                  >Project Title<span class="red">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="projectTitle"
+                  name="projectTitle"
+                  pattern="[a-zA-Z]+[a-zA-Z0-9\s-]*"
+                  #projectTitle="ngModel"
+                  ngModel
+                  maxlength="50"
+                  required
+                />
+                <div
+                  *ngIf="
+                    projectTitle.invalid &&
+                    (projectTitle.dirty || projectTitle.touched)
+                  "
+                  class="text-danger"
+                >
+                  <div *ngIf="projectTitle.errors?.['required']">
+                    Project Title is required.
+                  </div>
+                </div>
+                <div
+                  *ngIf="projectTitle.errors?.['pattern']"
+                  class="text-danger"
+                >
+                  Project Title is Invalid.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="startDate" class="form-label"
+                  >Start Date<span class="red">*</span></label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  id="startDate"
+                  name="start_date"
+                  ngModel
+                  #startDate="ngModel"
+                  required
+                  (ngModelChange)="
+                    validUpcoming($event, endDate.value, projectStatus.value)
+                  "
+                />
+                <div [hidden]="validUpcomingDate" class="text-danger">
+                  Invalid Start Date
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="projectStatus" class="form-label"
+                  >Project Status <span class="red">*</span></label
+                >
+                <select
+                  class="form-select"
+                  id="projectStatus"
+                  name="projectStatus"
+                  #projectStatus="ngModel"
+                  ngModel
+                  required
+                  (ngModelChange)="
+                    validateDates(startDate.value, endDate.value, $event);
+                    validUpcoming(startDate.value, endDate.value, $event)
+                  "
+                >
+                  <option value="COMPLETED">Completed</option>
+                  <option value="ONGOING">Ongoing</option>
+                  <option value="UPCOMING">Upcoming</option>
+                </select>
+                <div
+                  *ngIf="
+                    projectStatus.invalid &&
+                    (projectStatus.dirty || projectStatus.touched)
+                  "
+                  class="text-danger"
+                >
+                  Project Status is required.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="endtDate" class="form-label">End Date</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="endDate"
+                  name="end_date"
+                  #endDate="ngModel"
+                  ngModel
+                  (ngModelChange)="
+                    validateDates(startDate.value, $event, projectStatus.value);
+                    validUpcoming(startDate.value, $event, projectStatus.value)
+                  "
+                />
+                <div *ngIf="!validDate" class="text-danger">
+                  Invalid End Date
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="additionalInput1" class="form-label"
+                  >Department</label
+                >
+                <select
+                  class="form-control"
+                  id="department"
+                  name="department"
+                  ngModel
+                >
+                  <option selected value="">Select Department</option>
+                  <option *ngFor="let dept of deptData" [value]="dept.name">
+                    {{ dept.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="projectDesc" class="form-label"
+                  >Project Description<span class="red">*</span></label
+                >
+                <textarea
+                  class="form-control"
+                  id="projectDesc"
+                  name="projectDesc"
+                  #projectDesc="ngModel"
+                  ngModel
+                  required
+                  maxlength="150"
+                ></textarea>
+                <div
+                  *ngIf="
+                    projectDesc.invalid &&
+                    (projectDesc.dirty || projectDesc.touched)
+                  "
+                  class="text-danger"
+                >
+                  Project Description is required.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-center">
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="f.invalid || !validDate || !validUpcomingDate"
+          >
+            Submit
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+            (click)="f.reset()"
+            id="createbtn"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!--Delete Modal -->
+<div
+  class="modal fade"
+  id="deleteModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div
+    class="modal-dialog modal-dialog-centered modal-dialog-scrollable static"
+  >
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">
+          Do you wish to delete this record?
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        Name: {{ selectedProject.projectTitle }}, Project Id:
+        {{ selectedProject.projectId }}
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          id="delbtn"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="deleteProject(selectedProject.projectId)"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--View Modal -->
+<form #edit="ngForm" (ngSubmit)="editForm()" (input)="handleEditChange($event)">
+  <div
+    class="modal fade"
+    id="viewModal"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div
+      class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable static"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">
+            View/Edit Record
+          </h1>
+
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            (click)="resetFormOnClose(); edit.reset()"
+          ></button>
+        </div>
+        <div class="error-msg" [hidden]="editToggleError">
+          {{ editErrorMsg }}
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="name" class="form-label">
+                  Project Title<span class="red">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="projectTitle1"
+                  name="projectTitle"
+                  #projectTitle1="ngModel"
+                  ngModel
+                  value="{{ selectedProject.projectTitle }}"
+                  maxlength="50"
+                  required
+                />
+                <div
+                  *ngIf="
+                    projectTitle1.invalid &&
+                    (projectTitle1.dirty || projectTitle1.touched)
+                  "
+                  class="text-danger"
+                >
+                  Project Title is required.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="startDate" class="form-label">Start Date</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="startDate1"
+                  name="start_date"
+                  value="{{ selectedProject.start_date }}"
+                  ngModel
+                  #startDate1="ngModel"
+                  required
+                  (ngModelChange)="
+                    validUpcoming($event, endDate1.value, status1.value)
+                  "
+                />
+                <div [hidden]="validUpcomingDate" class="text-danger">
+                  Invalid Start Date
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="status" class="form-label">
+                  Project Status <span class="red">*</span></label
+                >
+                <select
+                  class="form-select"
+                  id="status1"
+                  name="projectStatus"
+                  #status1="ngModel"
+                  value="{{ selectedProject.projectStatus }}"
+                  ngModel
+                  required
+                  (ngModelChange)="
+                    validateDates(startDate1.value, endDate1.value, $event);
+                    validUpcoming(startDate1.value, endDate1.value, $event)
+                  "
+                >
+                  <option value="COMPLETED">Completed</option>
+                  <option value="ONGOING">Ongoing</option>
+                  <option value="UPCOMING">Upcoming</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="endtDate" class="form-label">End Date</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="endDate1"
+                  name="end_date"
+                  #endDate1="ngModel"
+                  value="{{ selectedProject.end_date }}"
+                  ngModel
+                  (ngModelChange)="
+                    validateDates(startDate1.value, $event, status1.value);
+                    validUpcoming(startDate1.value, $event, status1.value)
+                  "
+                />
+                <div *ngIf="!validDate" class="text-danger">
+                  Invalid End Date
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="additionalInput1" class="form-label"
+                  >Department</label
+                >
+                <select
+                  class="form-select"
+                  id="department1"
+                  name="department"
+                  ngModel
+                >
+                  <option selected value="{{ deptName }}">
+                    {{ deptName }}
+                  </option>
+                  <option
+                    id="selectbtn"
+                    *ngFor="let dept of deptData"
+                    value="{{ dept.name }}"
+                  >
+                    {{
+                      deptName.length == 0
+                        ? dept.name
+                        : dept.name != deptName
+                        ? dept.name
+                        : "Select Dept"
+                    }}
+                  </option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="desc" class="form-label">
+                  Project Description<span class="red">*</span></label
+                >
+                <textarea
+                  class="form-control"
+                  id="projectDesc1"
+                  name="projectDesc"
+                  #projectDesc1="ngModel"
+                  ngModel
+                  value="{{ selectedProject.projectDesc }}"
+                  [(ngModel)]="selectedProject.projectDesc"
+                  required
+                  maxlength="150"
+                ></textarea>
+                <div
+                  *ngIf="
+                    projectDesc1.invalid &&
+                    (projectDesc1.dirty || projectDesc1.touched)
+                  "
+                  class="text-danger"
+                >
+                  Project Description is required.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            id="edit"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+            (click)="resetFormOnClose(); edit.reset()"
+          >
+            Close
+          </button>
+          <button
+            [disabled]="editBtnDisabled || !validDate || !validUpcomingDate"
+            type="submit"
+            class="btn btn-success"
+          >
+            Update Details
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="viewProjectBackdrop"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">
+          {{ selectedProject.projectTitle }} Project
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>Total Employees - {{ projectEmployeeCount }}</p>
+        <div class="table-container">
+          <table class="table table-borderless">
+            <thead>
+              <tr>
+                <th>Sl. No</th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Company Email</th>
+                <th>Mobile No</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of projectEmpData; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.empID || "-" }}</td>
+                <td>
+                  {{ (item.firstName || "-") + " " + (item.lastName || "-") }}
+                </td>
+                <td>{{ item.gender || "-" }}</td>
+                <td>{{ item.companyEmail || "-" }}</td>
+                <td>{{ item.mobileNo || "-" }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

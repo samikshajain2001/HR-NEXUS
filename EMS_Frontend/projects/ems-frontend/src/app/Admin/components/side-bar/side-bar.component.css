@@ -1,0 +1,32 @@
+.sidebar {
+  height: 85vh;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  font-weight: 600;
+  border-right: 1px solid lightgray;
+}
+.item {
+  width: 100%;
+  padding: 1rem;
+  padding-left: 25%;
+  font-size: 1.2rem;
+}
+.content {
+  display: flex;
+  gap: 1rem;
+}
+.item:hover {
+  background-color: rgb(247, 247, 247);
+  cursor: pointer;
+  border-right: 6px solid #9b3855;
+}
+.active {
+  background-color: #f8f8f8;
+  color: #9b3855;
+  font-weight: 700;
+}
+.logout {
+  align-self: flex-end;
+}

@@ -1,0 +1,234 @@
+.navbar {
+  font-size: 1.5rem;
+  height: 5rem;
+  background-color: white;
+
+  padding-left: 4rem;
+  padding-right: 4rem;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid darkgrey;
+  align-items: center;
+}
+img {
+  height: 3.8rem;
+  width: 3.8rem;
+  border-radius: 50%;
+}
+
+.logo-txt {
+  font-weight: 700;
+  font-size: 1.7rem;
+}
+.logo-part {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.info-part {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.date {
+  color: grey;
+  font-size: 1.3rem;
+}
+.info {
+  display: flex;
+  flex-direction: column;
+  font-size: 1rem;
+}
+.name {
+  font-weight: 700;
+  font-size: 1rem;
+}
+.designation {
+  font-size: 0.8rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.mainDiv {
+  display: flex;
+  min-height: 100%;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+  font-family: 'Open Sans', sans-serif;
+}
+.cardStyle {
+  width: 800px;
+  border-color: white;
+  background: #fff;
+  padding: 36px 0;
+  border-radius: 4px;
+  margin: 30px 0;
+  box-shadow: 0px 0 2px 0 rgba(0,0,0,0.25);
+}
+#signupLogo {
+max-height: 100px;
+margin: auto;
+display: flex;
+flex-direction: column;
+}
+.formTitle{
+font-weight: 600;
+margin-top: 20px;
+color: #2F2D3B;
+text-align: center;
+}
+.inputLabel {
+font-size: 12px;
+color: #555;
+margin-bottom: 6px;
+margin-top: 24px;
+}
+.inputDiv {
+  /* width: 70%; */
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+}
+.z{
+  width: 60%;
+}
+input {
+height: 40px;
+font-size: 16px;
+border-radius: 4px;
+border: none;
+border: solid 1px #ccc;
+padding: 0 11px;
+}
+input:disabled {
+cursor: not-allowed;
+border: solid 1px #eee;
+}
+.buttonWrapper {
+margin-top: 40px;
+}
+.submitButton {
+  width: 55%;
+  height: 40px;
+  margin: auto;
+  display: block;
+  color: #fff;
+  background-color: #9b3855;
+  border-color: #065492;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.035);
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.submitButton:disabled,
+button[disabled] {
+border: 1px solid #cccccc;
+background-color: #cccccc;
+color: #666666;
+}
+
+#loader {
+position: absolute;
+z-index: 1;
+margin: -2px 0 0 10px;
+border: 4px solid #f3f3f3;
+border-radius: 50%;
+border-top: 4px solid #666666;
+width: 14px;
+height: 14px;
+-webkit-animation: spin 2s linear infinite;
+animation: spin 2s linear infinite;
+}
+
+
+
+.required-star {
+  color: red;
+  margin-left: 5px; 
+}
+.text-danger {
+  color: red; /* Change color as needed */
+  font-size: 0.8rem; /* Adjust font size as needed */
+  
+}
+
+.mainDiv{
+  background-color: #fff;
+}
+
+
+
+
+
+
+.password-toggle {
+  position: relative;
+}
+
+.password-toggle input {
+  padding-right: 30px; 
+}
+
+.password-toggle .toggle-icon {
+  position: absolute;
+  top: 50%;
+  right: 10px; 
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+
+.ss{
+  display: flex;
+  flex-direction: row;
+  flex:3
+}
+.bi{
+  padding-left: 0.8rem;
+}
+.txt-center{
+  margin: auto;
+}
+
+
+
+
+
+
+
+
+
+
+.btn-close-custom{
+  color: #fff;
+}
+.modal-body{
+  padding:0rem;
+  
+}
+.cardStyle{
+  box-shadow: none;
+  padding: 0;
+}
+.modal-content{
+  width: 78%;
+}

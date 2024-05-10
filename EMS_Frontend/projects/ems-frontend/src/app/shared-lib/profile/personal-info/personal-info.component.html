@@ -1,0 +1,92 @@
+<div class="main-container">
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="item">
+        <i class="circle"></i>
+
+
+        <div class="div">
+          <div>Emp ID</div>
+          <div>{{ userData.empID }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="item">
+        <i class="circle"></i>
+
+
+        <div class="div">
+          <div>Date of Birth</div>
+          <div>{{ userData.dob | date : "yyyy/MM/dd" || "-" }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="item">
+        <i class="circle"></i>
+
+
+        <div class="div">
+          <div>Personal Email</div>
+          <div>{{ userData.personalEmail || "-" }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="item">
+        <i class="circle"></i>
+
+
+        <div class="div">
+          <div>Joining Date</div>
+          <div>{{ userData.joiningDate | date : "yyyy/MM/dd" || "-" }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="item">
+        <i class="circle"></i>
+
+
+        <div class="div">
+          <div>State</div>
+          <div>{{ userData.state || "-" }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="item">
+        <i class="circle"></i>
+
+
+        <div class="div">
+          <div>City</div>
+          <div>{{ userData.city || "-" }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="item">
+        <i class="circle"></i>
+
+
+        <div class="div">
+          <div>Pincode</div>
+          <div>{{ userData.pincode || "-" }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="item">
+        <i class="circle"></i>
+
+
+        <div class="div">
+          <div>Street</div>
+          <div>{{ userData.street || "-" }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

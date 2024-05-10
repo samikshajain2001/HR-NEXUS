@@ -1,0 +1,65 @@
+.main-container {
+  height: 90vh;
+  width: 100%;
+  background-color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  justify-content: start;
+}
+.title-txt {
+  font-weight: 500;
+  font-size: 2rem;
+  color: gray;
+}
+.top-line {
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+}
+.create-btn {
+  background-color: #9b3855;
+  border: none;
+  padding: 1rem;
+}
+.gen-btn {
+  background-color: #9b3855;
+  border: none;
+  padding: 1rem;
+  width: 10rem;
+}
+.form-select {
+  width: 20%;
+}
+.select-section {
+  margin-top: 2%;
+  display: flex;
+  gap: 2rem;
+  align-items: baseline;
+}
+.filters-emp {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: baseline;
+  margin-left: 2rem;
+}
+.filters-pro {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: baseline;
+  margin-left: 2rem;
+}
+.filter-item {
+  display: flex;
+  align-items: baseline;
+  gap: 2rem;
+}
+.filter {
+  width: 120%;
+}
+.filter-by-txt {
+  width: 100%;
+}

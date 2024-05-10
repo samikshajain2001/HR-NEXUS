@@ -1,0 +1,56 @@
+<div class="main-container">
+  <div class="login-container">
+    <div class="input-container">
+      <div class="div">
+        <img id="logo" src="../../../assets/logo.png" alt="logo" />
+        <div id="title-txt">HR NEXUS</div>
+        <div id="subtitle-txt">
+          Enter your credentials to access your account
+        </div>
+      </div>
+      <form #f="ngForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="exampleInputEmail1">Username <span>*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            id="exampleInputUsername1"
+            aria-describedby="UsernameHelp"
+            placeholder="Enter username"
+            name="userName"
+            ngModel
+            required
+            #inputvar
+          />
+        </div>
+        <span class="empty-error" [hidden]="usernameError" style="color: red">
+          *Username cannot be empty
+        </span>
+        <div class="form-group">
+          <label for="exampleInputPassword1">Password <span>*</span></label>
+          <input
+            type="password"
+            class="form-control"
+            id="exampleInputPassword1"
+            placeholder="Password"
+            name="password"
+            ngModel
+            required
+          />
+        </div>
+        <span class="empty-error" [hidden]="passwordError">
+          *Password cannot be empty
+        </span>
+        <button type="submit" class="btn btn-primary">Login</button>
+        <span class="invalid-error" [hidden]="errorhide">{{ errorMsg }}</span>
+      </form>
+      <div class="bottom">
+        <div>Streamline your workforce with HR Nexus</div>
+        <div>Your ultimate solution for efficient employee management.</div>
+      </div>
+    </div>
+    <div class="img-container">
+      <img src="../../../assets/img.png" id="login-img" alt="" />
+    </div>
+  </div>
+</div>

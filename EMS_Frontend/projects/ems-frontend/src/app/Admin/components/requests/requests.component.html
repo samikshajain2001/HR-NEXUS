@@ -1,0 +1,145 @@
+<div class="main-container">
+  <div class="top-bar">
+    <div class="info">
+      <span class="title-txt">Requests for Information Updation</span>
+    </div>
+  </div>
+  <div class="mini-container">
+    <div class="card left-side">
+      <div class="subtitle-txt">Pending Requests</div>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Sl No.</th>
+            <th scope="col">Requested By</th>
+            <th scope="col">Created At</th>
+            <th scope="col">Status</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of requestsData; let i = index">
+            <td>{{ calcSlNo(i + 1) }}</td>
+            <td>{{ item.requestedBy }}</td>
+            <td>{{ item.createdAt }}</td>
+
+            <td>
+              <span
+                class="badge"
+                [ngClass]="{
+                  pending: item.status === 'PENDING',
+                }"
+                >{{ item.status }}</span
+              >
+            </td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-success viewbtn"
+                (click)="viewRequest(item)"
+              >
+                <i class="bi bi-eye"></i> View
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <nav
+        class="pagination-container d-flex align-items-baseline gap-5"
+        aria-label="Page navigation example"
+      >
+        <div class="pagination-info">
+          <span>Total Items: {{ totalItems }} </span
+          ><span>Page Size: {{ pageSize }} </span>
+        </div>
+
+        <ul class="pagination d-flex gap-3">
+          <div class="d-flex">
+            <li
+              class="page-item"
+              [class.disabled]="page === 1"
+              (click)="this.page !== 1 && previousPage()"
+            >
+              <a class="page-link" aria-label="Previous">
+                <span aria-hidden="true"> &laquo; Previous</span>
+              </a>
+            </li>
+            <li class="page-item" *ngFor="let p of pages" (click)="setPage(p)">
+              <a class="page-link" [ngClass]="{ 'active-page': p === page }">{{
+                p
+              }}</a>
+            </li>
+
+            <li
+              class="page-item"
+              [class.disabled]="page === totalPages || totalPages === 0"
+              (click)="this.page !== totalPages && nextPage()"
+            >
+              <a class="page-link" aria-label="Next">
+                <span aria-hidden="true">Next &raquo;</span>
+              </a>
+            </li>
+          </div>
+        </ul>
+      </nav>
+    </div>
+    <div class="card right-side" *ngIf="viewCard === true">
+      <div class="details">
+        <h2>Update Request</h2>
+        <div class="user-detail">
+          <p>
+            Requested By:
+            <span class="requester">{{ userData.requestedBy }}</span>
+          </p>
+          <p [ngClass]="{ highlight: userData.firstName }">
+            First Name: {{ userData.firstName }}
+          </p>
+          <p [ngClass]="{ highlight: userData.lastName }">
+            Last Name: {{ userData.lastName }}
+          </p>
+          <p [ngClass]="{ highlight: userData.mobileNo }">
+            Mobile No: {{ userData.mobileNo }}
+          </p>
+          <p [ngClass]="{ highlight: userData.dob }">
+            Date of Birth: {{ userData.dob }}
+          </p>
+          <p [ngClass]="{ highlight: userData.joiningDate }">
+            Joining Date: {{ userData.joiningDate }}
+          </p>
+          <p [ngClass]="{ highlight: userData.companyEmail }">
+            Company Email: {{ userData.companyEmail }}
+          </p>
+          <p [ngClass]="{ highlight: userData.personalEmail }">
+            Personal Email: {{ userData.personalEmail }}
+          </p>
+          <p [ngClass]="{ highlight: userData.street }">
+            Street: {{ userData.street }}
+          </p>
+          <p [ngClass]="{ highlight: userData.city }">
+            City: {{ userData.city || "No Change" }}
+          </p>
+          <p [ngClass]="{ highlight: userData.pincode }">
+            Pincode: {{ userData.pincode || "No Change" }}
+          </p>
+          <p [ngClass]="{ highlight: userData.state }">
+            State: {{ userData.state }}
+          </p>
+          <p [ngClass]="{ highlight: userData.gender }">
+            Gender: {{ userData.gender }}
+          </p>
+          <p [ngClass]="{ highlight: userData.profileImgUrl }">
+            Profile Image: {{ userData.profileImgUrl }}
+          </p>
+        </div>
+        <div class="decision">
+          <button class="btn btn-danger" (click)="requestDecision('REJECTED')">
+            <i class="bi bi-x"></i>Reject
+          </button>
+          <button class="btn btn-success" (click)="requestDecision('APPROVED')">
+            <i class="bi bi-check"></i>Approve
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

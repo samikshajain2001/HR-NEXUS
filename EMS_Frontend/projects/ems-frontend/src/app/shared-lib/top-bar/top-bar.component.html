@@ -1,0 +1,197 @@
+<div class="navbar">
+  <div class="logo-part">
+    <img src="../../assets/logo.png" alt="" class="logo-img" />
+    <span class="logo-txt">HR NEXUS</span>
+  </div>
+  <div class="info-part">
+    <button
+      type="button"
+      class="btn btn-success"
+      data-bs-toggle="modal"
+      data-bs-target="#staticBackdropm"
+    >
+      Change Password
+    </button>
+    <!-- <span class="date">{{ date }}</span> -->
+    <div class="profile">
+      <img
+        src="{{
+          user.profileImgUrl
+            ? user.profileImgUrl
+            : '../../assets/defaultProfile.png'
+        }}"
+        alt="profile"
+      />
+
+      <div class="info">
+        <span class="name">{{ user.firstName }}</span>
+        <span class="designation"
+          >{{
+            user.authorities[0].authority == "ROLE_HR"
+              ? "HR_MANAGER"
+              : "EMPLOYEE"
+          }}
+        </span>
+      </div>
+      <!-- <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdropm"   >
+      Change Password
+      </button> -->
+
+      <div
+        class="modal fade"
+        id="staticBackdropm"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+        tabindex="-1"
+        aria-labelledby="staticBackdropLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header" style="background-color: #9b3855">
+              <h1
+                class="modal-title fs-5 txt-center"
+                id="staticBackdropLabel"
+                style="color: #fff; margin-left: 2.5rem"
+              >
+                Change Your Password
+              </h1>
+
+              <button
+                type="button"
+                class="btn btn-outline-light btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                (click)="newform.reset()"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="mainDiv">
+                <div class="cardStyle">
+                  <div>
+                    <form
+                      #newform="ngForm"
+                      name="signupForm"
+                      id="signupForm"
+                      (ngSubmit)="save(newform.value); newform.reset()"
+                      novalidate
+                    >
+                      <div class="inputDiv z">
+                        <label class="inputLabel" for="oldpassword"
+                          >Old Password<span class="required-star"
+                            >*</span
+                          ></label
+                        >
+                        <div class="ss">
+                          <input
+                            ngModel
+                            type="password"
+                            id="oldpassword"
+                            name="oldpassword"
+                            required
+                            #oldpassword="ngModel"
+                          />
+                          <i
+                            class="bi bi-eye-slash toggle-icon"
+                            (click)="
+                              togglePassword('oldpassword', 'togglePassword')
+                            "
+                          ></i>
+                        </div>
+
+                        <div
+                          *ngIf="oldpassword.invalid && oldpassword.touched"
+                          class="text-danger"
+                        >
+                          Old Password Required
+                        </div>
+                      </div>
+                      <div class="inputDiv z">
+                        <label class="inputLabel" for="newpassword"
+                          >New Password<span class="required-star"
+                            >*</span
+                          ></label
+                        >
+                        <div class="ss">
+                          <input
+                            ngModel
+                            type="password"
+                            id="newpassword"
+                            name="password"
+                            required
+                            #newpassword="ngModel"
+                            minlength="8"
+                            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?=.*\w).{8,}"
+                          />
+                          <i
+                            class="bi bi-eye-slash toggle-icon"
+                            (click)="
+                              togglePassword('newpassword', 'togglePassword')
+                            "
+                          ></i>
+                        </div>
+                        <div
+                          *ngIf="
+                            (newpassword.touched || newpassword.dirty) &&
+                            newpassword.invalid
+                          "
+                          class="text-danger"
+                        >
+                          Password must be at least 8 characters long and
+                          contain at least one digit, one special character, one
+                          uppercase letter, and one lowercase letter.
+                        </div>
+                      </div>
+
+                      <div class="inputDiv z">
+                        <label class="inputLabel" for="repassword"
+                          >Confirm Password<span class="required-star"
+                            >*</span
+                          ></label
+                        >
+                        <div class="ss">
+                          <input
+                            ngModel
+                            type="password"
+                            id="repassword"
+                            name="repassword"
+                            required
+                            #rpassword="ngModel"
+                          />
+                          <i
+                            class="bi bi-eye-slash toggle-icon"
+                            (click)="
+                              togglePassword('repassword', 'togglePassword')
+                            "
+                          ></i>
+                        </div>
+                        <div
+                          *ngIf="rpassword.invalid && rpassword.touched"
+                          class="text-danger"
+                        >
+                          Confirm Password Required
+                        </div>
+                      </div>
+                      <div class="buttonWrapper">
+                        <button
+                          type="submit"
+                          id="submitButton"
+                          class="submitButton pure-button pure-button-primary"
+                          [disabled]="newform.invalid"
+                          aria-label="Close"
+                          data-bs-dismiss="modal"
+                        >
+                          <span>Submit</span>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

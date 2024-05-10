@@ -1,0 +1,721 @@
+<div class="main-container">
+  <div class="top-bar">
+    <div class="info">
+      <span class="title-txt">List of Paygrades</span>
+      <button
+        type="button"
+        class="btn btn-success create-btn"
+        data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop"
+      >
+        <i class="bi bi-sliders"></i>
+        Create Paygrade
+      </button>
+    </div>
+    <div class="input-group">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <!-- use above for search query -->
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search Paygrade"
+        [(ngModel)]="searchQuery"
+        (input)="searchQueryFire()"
+      />
+    </div>
+  </div>
+  <div class="table">
+    <table class="table table-striped">
+      <thead>
+        <tr class="header-row">
+          <th scope="col">Sl. No</th>
+          <th scope="col">Paygrade Name</th>
+          <th scope="col">Minimum Pay ₹</th>
+          <th scope="col">HRA %</th>
+          <th scope="col">PFs %</th>
+          <th scope="col">DA %</th>
+          <th scope="col">Maximum Pay ₹</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody *ngFor="let item of paygradeData; let i = index">
+        <tr>
+          <td>{{ calcSlNo(i + 1) }}</td>
+          <td>{{ item.paygradeName }}</td>
+          <td>{{ item.minPay }}</td>
+          <td>{{ item.hra }} %</td>
+          <td>{{ item.pfs }} %</td>
+          <td>{{ item.da }} %</td>
+          <td>{{ item.maxPay }}</td>
+          <td class="actions-row">
+            <button
+              type="button"
+              class="btn btn-success viewbtn"
+              (click)="showAllEmployees(item)"
+              data-bs-toggle="modal"
+              data-bs-target="#viewDeptBackdrop"
+            >
+              <i class="bi bi-people-fill"></i>
+            </button>
+            <button
+              type="button"
+              class="btn btn-success viewbtn"
+              data-bs-toggle="modal"
+              data-bs-target="#viewModal"
+              (click)="selectPaygrade(item)"
+            >
+              <i class="bi bi-pencil-square"></i>
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger delbtn"
+              data-bs-toggle="modal"
+              data-bs-target="#deleteModal"
+              (click)="selectPaygrade(item)"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <nav
+    class="pagination-container d-flex align-items-baseline gap-5"
+    aria-label="Page navigation example"
+  >
+    <div class="pagination-info">
+      <span> Total Items: {{ totalItems }} </span
+      ><span>Page Size: {{ pageSize }} </span>
+    </div>
+
+    <ul class="pagination d-flex gap-3">
+      <div class="d-flex">
+        <li
+          class="page-item"
+          [class.disabled]="page === 1"
+          (click)="this.page !== 1 && previousPage()"
+        >
+          <a class="page-link" aria-label="Previous">
+            <span aria-hidden="true" (click)="previousPage()">
+              &laquo; Previous</span
+            >
+          </a>
+        </li>
+        <li class="page-item" *ngFor="let p of pages" (click)="setPage(p)">
+          <a class="page-link" [ngClass]="{ 'active-page': p === page }">{{
+            p
+          }}</a>
+        </li>
+
+        <li
+          class="page-item"
+          [class.disabled]="page === totalPages"
+          (click)="this.page !== totalPages && nextPage()"
+        >
+          <a class="page-link" aria-label="Next">
+            <span aria-hidden="true">Next &raquo;</span>
+          </a>
+        </li>
+      </div>
+    </ul>
+  </nav>
+</div>
+<!-- Creating paygrade -->
+<form #f="ngForm" (ngSubmit)="submitForm()" novalidate>
+  <div
+    class="modal fade"
+    id="staticBackdrop"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div
+      class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable static modal-form"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">
+            Provide Paygrade Details
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            data-bs-dismiss="modal"
+            (click)="f.reset()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col">
+              <div class="mb-3">
+                <label for="paygradeName" class="text-center form-label">
+                  Paygrade Name <span class="red">*</span>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="paygradeName"
+                  name="paygradeName"
+                  #paygradeName="ngModel"
+                  ngModel
+                  required
+                  pattern="[a-zA-Z]+[a-zA-Z0-9\s-]*"
+                  maxlength="30"
+                />
+                <div
+                  *ngIf="
+                    paygradeName.invalid &&
+                    (paygradeName.dirty || paygradeName.touched)
+                  "
+                  class="text-danger"
+                >
+                  <div *ngIf="paygradeName.errors?.['required']">
+                    Paygrade is required.
+                  </div>
+
+                  <div
+                    *ngIf="paygradeName.errors?.['pattern']"
+                    class="text-danger"
+                  >
+                    Special characters or numbers alone are not permitted .
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="minPay" class="text-center form-label"
+                  >Minimum Pay
+                </label>
+                <i class="bi bi-currency-rupee"> <span class="red">*</span></i>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="minPay"
+                  name="minPay"
+                  ngModel
+                  min="0"
+                  #minPay="ngModel"
+                  required
+                />
+                <div
+                  *ngIf="minPay.invalid && (minPay.dirty || minPay.touched)"
+                  class="text-danger"
+                >
+                  <div *ngIf="minPay.errors?.['required']">
+                    Minimum Pay is required.
+                  </div>
+                  <div *ngIf="minPay.errors?.['min']">
+                    Minimum Pay cannot be below 0 .
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="maxPay" class="form-label"> Maximum Pay </label>
+                <i class="bi bi-currency-rupee"><span class="red">*</span></i>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="maxPay"
+                  name="maxPay"
+                  #maxPay="ngModel"
+                  ngModel
+                  min="0"
+                  required
+                />
+                <div
+                  *ngIf="maxPay.invalid && (maxPay.dirty || maxPay.touched)"
+                  class="text-danger"
+                >
+                  <div *ngIf="maxPay.errors?.['required']">
+                    Maximum Pay is required.
+                  </div>
+
+                  <div *ngIf="maxPay.errors?.['min']">
+                    Max value cannot be below 0 .
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="hra" class="form-label"
+                  >HRA % <span class="red">*</span></label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  id="hra"
+                  name="hra"
+                  #hra="ngModel"
+                  ngModel
+                  required
+                  min="0"
+                  max="100"
+                  pattern="^\d+(\.\d{1,2})?$"
+                />
+                <div
+                  *ngIf="hra.invalid && (hra.dirty || hra.touched)"
+                  class="text-danger"
+                >
+                  <div *ngIf="hra.errors?.['required']">HRA is required.</div>
+                  <div *ngIf="hra?.errors?.['max']">
+                    Max value cannot exceed 100%.
+                  </div>
+                  <div *ngIf="hra.errors?.['min']">
+                    Min value cannot be below 0%.
+                  </div>
+                  <div *ngIf="!hra.errors?.['min'] && hra.errors?.['pattern']">
+                    Only two decimal places are allowed for HRA.
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="pfs" class="form-label"
+                  >PFs % <span class="red">*</span></label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  id="pfs"
+                  name="pfs"
+                  #pfs="ngModel"
+                  ngModel
+                  required
+                  min="0"
+                  max="100"
+                  pattern="^\d+(\.\d{1,2})?$"
+                />
+                <div
+                  *ngIf="pfs.invalid && (pfs.dirty || pfs.touched)"
+                  class="text-danger"
+                >
+                  <div *ngIf="pfs.errors?.['required']">PFs is required.</div>
+                  <div *ngIf="pfs?.errors?.['max']">
+                    Max value cannot exceed 100%.
+                  </div>
+                  <div *ngIf="pfs.errors?.['min']">
+                    Max value cannot be below 0%.
+                  </div>
+                  <div *ngIf="!pfs.errors?.['min'] && pfs.errors?.['pattern']">
+                    Only two decimal places are allowed for PF.
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="da" class="form-label"
+                  >DA % <span class="red">*</span></label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  id="da"
+                  name="da"
+                  #da="ngModel"
+                  ngModel
+                  required
+                  min="0"
+                  max="100"
+                  pattern="^\d+(\.\d{1,2})?$"
+                />
+                <div
+                  *ngIf="da.invalid && (da.dirty || da.touched)"
+                  class="text-danger"
+                >
+                  <div *ngIf="da.errors?.['required']">DA is required.</div>
+                  <div *ngIf="da?.errors?.['max']">
+                    Max value cannot exceed 100%.
+                  </div>
+                  <div *ngIf="da.errors?.['min']">
+                    Min value cannot be below 0%.
+                  </div>
+                  <div *ngIf="!da?.errors?.['min'] && da.errors?.['pattern']">
+                    Only two decimal places are allowed for DA.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-center">
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="f.invalid || !paygradeName.valid"
+          >
+            Submit
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+            (click)="f.reset()"
+            id="createbtn"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- VIEW/EDIT PAYGRADE MODAL -->
+
+<!-- <form #edit="ngForm"> -->
+<form #edit="ngForm" (ngSubmit)="editForm()">
+  <div
+    class="modal fade"
+    id="viewModal"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div
+      class="modal-dialog modal-dialog-centered modal-dialog-scrollable static"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">
+            View/Edit Paygrade
+          </h1>
+
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            (click)="edit.reset(); resetDetails()"
+          ></button>
+        </div>
+        <!-- MODAL BODY  -->
+        <div class="modal-body">
+          <div class="row">
+            <div class="col">
+              <div class="mb-3">
+                <label for="paygradeName" class="text-center form-label"
+                  >Paygrade Name <span class="red">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="paygradeName1"
+                  name="paygradeName"
+                  ngModel
+                  #paygradeName1="ngModel"
+                  value="{{ selectedPaygrade.paygradeName }}"
+                  required
+                  pattern="[a-zA-Z]+[a-zA-Z0-9\s-]*"
+                  maxlength="30"
+                />
+                <div
+                  *ngIf="paygradeName1.invalid && paygradeName1.dirty"
+                  class="text-danger"
+                >
+                  <div *ngIf="paygradeName1.errors?.['required']">
+                    Paygrade is required.
+                  </div>
+
+                  <div
+                    *ngIf="paygradeName1.errors?.['pattern']"
+                    class="text-danger"
+                  >
+                    Special characters or numbers alone are not permitted .
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="minPay" class="text-center form-label"
+                  >Minimum Pay
+                </label>
+                <i class="bi bi-currency-rupee"></i><span class="red">*</span>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="minPay1"
+                  name="minPay"
+                  ngModel
+                  #minPay1="ngModel"
+                  value="{{ selectedPaygrade.minPay }}"
+                  min="0"
+                  required
+                />
+                <div
+                  *ngIf="minPay1.invalid && minPay1.dirty"
+                  class="text-danger"
+                >
+                  <div *ngIf="minPay1.errors?.['required']">
+                    Minimum Pay is required.
+                  </div>
+                  <div *ngIf="minPay1.errors?.['min']">
+                    Minimum Pay cannot be below 0 .
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="maxPay" class="form-label"> Maximum Pay </label>
+                <i class="bi bi-currency-rupee"></i><span class="red">*</span>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="maxPay1"
+                  name="maxPay"
+                  ngModel
+                  #maxPay1="ngModel"
+                  value="{{ selectedPaygrade.maxPay }}"
+                  required
+                  min="0"
+                />
+                <div
+                  *ngIf="maxPay1.invalid && maxPay1.dirty"
+                  class="text-danger"
+                >
+                  <div *ngIf="maxPay1.errors?.['required']">
+                    Maximum Pay is required.
+                  </div>
+                  <div *ngIf="maxPay1.errors?.['min']">
+                    Max value cannot be below 0 .
+                  </div>
+                  <span class="red">*</span>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="hra" class="form-label"
+                  >HRA %<span class="red">*</span></label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  id="hra1"
+                  name="hra"
+                  #hra1="ngModel"
+                  ngModel
+                  required
+                  value="{{ selectedPaygrade.hra }}"
+                  min="0"
+                  max="100"
+                  pattern="^\d+(\.\d{1,2})?$"
+                />
+                <div *ngIf="hra1.invalid && hra1.dirty" class="text-danger">
+                  <div *ngIf="hra1.errors?.['required']">HRA is required.</div>
+                  <div *ngIf="hra1?.errors?.['max']">
+                    Max value cannot exceed 100%.
+                  </div>
+                  <div *ngIf="hra1.errors?.['min']">
+                    Min value cannot be below 0%.
+                  </div>
+                  <div
+                    *ngIf="!hra1?.errors?.['min'] && hra1.errors?.['pattern']"
+                  >
+                    Only two decimal places are allowed for HRA.
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="pfs" class="form-label"
+                  >PFs %<span class="red">*</span></label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  id="pfs1"
+                  name="pfs"
+                  #pfs1="ngModel"
+                  ngModel
+                  required
+                  value="{{ selectedPaygrade.pfs }}"
+                  min="0"
+                  max="100"
+                  pattern="^\d+(\.\d{1,2})?$"
+                />
+                <div *ngIf="pfs1.invalid && pfs1.dirty" class="text-danger">
+                  <div *ngIf="pfs1.errors?.['required']">PFs is required.</div>
+                  <div *ngIf="pfs1?.errors?.['max']">
+                    Max value cannot exceed 100%.
+                  </div>
+                  <div *ngIf="pfs1.errors?.['min']">
+                    Max value cannot be below 0%.
+                  </div>
+                  <div
+                    *ngIf="!pfs1?.errors?.['min'] && pfs1.errors?.['pattern']"
+                  >
+                    Only two decimal places are allowed for PF.
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="da" class="form-label"
+                  >DA %<span class="red">*</span></label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  id="da1"
+                  name="da"
+                  #da1="ngModel"
+                  ngModel
+                  value="{{ selectedPaygrade.da }}"
+                  required
+                  min="0"
+                  max="100"
+                  pattern="^\d+(\.\d{1,2})?$"
+                />
+                <div *ngIf="da1.invalid && da1.dirty" class="text-danger">
+                  <div *ngIf="da1.errors?.['required']">DA is required.</div>
+                  <div *ngIf="da1?.errors?.['max']">
+                    Max value cannot exceed 100%.
+                  </div>
+                  <div *ngIf="da1.errors?.['min']">
+                    Min value cannot be below 0%.
+                  </div>
+                  <div *ngIf="!da1?.errors?.['min'] && da1.errors?.['pattern']">
+                    Only two decimal places are allowed for PF.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            id="editbtn"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+            (click)="edit.reset(); resetDetails()"
+          >
+            Close
+          </button>
+          <button
+            type="submit"
+            [disabled]="
+              (paygradeName1.dirty && paygradeName1.invalid) ||
+              (minPay1.dirty && minPay1.invalid) ||
+              (maxPay1.dirty && maxPay1.invalid) ||
+              (pfs1.dirty && pfs1.invalid) ||
+              (da1.dirty && da1.invalid) ||
+              (hra1.dirty && hra1.invalid)
+            "
+            class="btn btn-success"
+          >
+            Update
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- DELETE MODAL -->
+<div
+  class="modal fade"
+  id="deleteModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div
+    class="modal-dialog modal-dialog-centered modal-dialog-scrollable static"
+  >
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">
+          Do you wish to delete this record?
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        Name:
+        {{
+          selectedPaygrade.paygradeName
+            ? selectedPaygrade.paygradeName
+            : "Not found"
+        }}
+        : Pay Grade id is
+        {{ selectedPaygrade.id }}
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          id="delbtn"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+          (click)="f.reset()"
+        >
+          Close
+        </button>
+        <button
+          type="submit"
+          class="btn btn-danger"
+          (click)="deletePaygrade(selectedPaygrade.id)"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div
+  class="modal fade"
+  id="viewDeptBackdrop"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">
+          {{ currentPaygrade.paygradeName }} Paygrade
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>Total Employees - {{ empCount }}</p>
+        <div class="table-container">
+          <table class="table table-borderless">
+            <thead>
+              <tr>
+                <th>Sl. No</th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Company Email</th>
+                <th>Mobile No</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of allEmps; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.empID || "-" }}</td>
+
+                <td>
+                  {{ (item.firstName || "-") + " " + (item.lastName || "-") }}
+                </td>
+                <td>{{ item.gender || "-" }}</td>
+                <td>{{ item.companyEmail || "-" }}</td>
+                <td>{{ item.mobileNo || "-" }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

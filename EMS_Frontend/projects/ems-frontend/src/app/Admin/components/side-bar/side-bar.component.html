@@ -1,0 +1,71 @@
+<div class="sidebar" column-4>
+  <div class="div">
+    <div
+      class="item"
+      routerLink="dashboard"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      <div class="content">
+        <i class="bi bi-pc-display"></i>
+        <span>Dashboard</span>
+      </div>
+    </div>
+    <div
+      class="item"
+      routerLink="profile/personalinfo"
+      routerLinkActive="active"
+    >
+      <div class="content">
+        <i class="bi bi-person-square"></i>
+        <span>Your Profile</span>
+      </div>
+    </div>
+    <div class="item" routerLink="employees" routerLinkActive="active">
+      <div class="content">
+        <i class="bi bi-people-fill"></i>
+        <span>Employees</span>
+      </div>
+    </div>
+    <div class="item" routerLink="departments" routerLinkActive="active">
+      <div class="content">
+        <i class="bi bi-person-video2"></i>
+        <span>Departments</span>
+      </div>
+    </div>
+
+    <div class="item" routerLink="projects" routerLinkActive="active">
+      <div class="content">
+        <i class="bi bi-motherboard"></i>
+        <span>Projects</span>
+      </div>
+    </div>
+
+    <div class="item" routerLink="paygrades" routerLinkActive="active">
+      <div class="content">
+        <i class="bi bi-currency-dollar"></i>
+        <span>Paygrade</span>
+      </div>
+    </div>
+
+    <div class="item" routerLink="reports" routerLinkActive="active">
+      <div class="content">
+        <i class="bi bi-book-half"></i>
+        <span>Reports</span>
+      </div>
+    </div>
+    <div class="item" routerLink="requests" routerLinkActive="active">
+      <div class="content">
+        <i class="bi bi-person-bounding-box"></i>
+        <span>Requests</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="item logout" (click)="logout()">
+    <div class="content">
+      <i class="bi bi-box-arrow-right"></i>
+      <span>Logout</span>
+    </div>
+  </div>
+</div>

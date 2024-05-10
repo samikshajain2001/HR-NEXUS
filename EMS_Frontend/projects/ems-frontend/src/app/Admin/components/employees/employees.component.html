@@ -1,0 +1,1361 @@
+<div class="main-container">
+  <div class="top-bar">
+    <div class="info">
+      <span class="title-txt">List of Employees</span>
+      <button
+        type="button"
+        class="btn btn-success create-btn"
+        data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop"
+        (click)="requiredData()"
+      >
+        <i class="bi bi-person-add"></i>
+
+        Create Employee
+      </button>
+      <button
+        type="button"
+        class="btn btn-success create-btn"
+        data-bs-toggle="modal"
+        data-bs-target="#designationBackdrop"
+        (click)="requiredData()"
+      >
+        <i class="bi bi-person-add"></i>
+
+        Add Designation
+      </button>
+    </div>
+
+    <div class="input-group">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search for an employee"
+        [(ngModel)]="searchQuery"
+        (input)="searchQueryFire()"
+      />
+    </div>
+  </div>
+
+  <div class="table">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <td>Sort By :</td>
+          <td>
+            <select
+              class="form-select form-select-sm"
+              aria-label="Small select example"
+              [(ngModel)]="sortParam"
+              (ngModelChange)="sortEmp()"
+            >
+              <option value="firstName asc">Name (Ascending)</option>
+              <option value="firstName desc">Name (Descending)</option>
+              <option value="empID asc">ID (Ascending)</option>
+              <option value="empID desc">ID (Descending)</option>
+              <option value="joiningDate asc">
+                Date of Joining (Ascending)
+              </option>
+              <option value="joiningDate desc">
+                Date of Joining (Descending)
+              </option>
+            </select>
+          </td>
+
+          <td>
+            <button class="btn btn-success" (click)="clearFilter()">
+              <i class="bi bi-arrow-clockwise"></i> Reset
+            </button>
+          </td>
+        </tr>
+        <tr class="header-row">
+          <th scope="col">Sl. No</th>
+          <th scope="col">Emp_Id</th>
+          <th scope="col">Full Name</th>
+          <th scope="col">Gender</th>
+          <th scope="col">Mobile No</th>
+          <th scope="col">Department</th>
+          <th scope="col">Company Email</th>
+          <th scope="col">DOJ</th>
+          <th scope="col">Employment Status</th>
+
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of employeesData; let i = index">
+          <td>{{ calcSlNo(i + 1) }}</td>
+          <td>{{ item.empID }}</td>
+          <td>{{ item.firstName + " " + item.lastName }}</td>
+          <td>{{ item.gender }}</td>
+          <td>{{ item.mobileNo }}</td>
+          <td>
+            {{ item.department ? item.department.name : "-" }}
+          </td>
+          <td>{{ item.companyEmail }}</td>
+          <td>{{ item.joiningDate | date : "MMMM d, y" }}</td>
+          <td>
+            <span
+              class="badge"
+              [ngClass]="{
+                active: item.status === 'ACTIVE',
+                resign: item.status === 'RESIGN',
+                retire: item.status === 'RETIRE',
+                layoff: item.status === 'LAYOFF'
+              }"
+              >{{ item.status }}</span
+            >
+          </td>
+
+          <td class="actions-row">
+            <button
+              type="button"
+              class="btn btn-success viewbtn"
+              data-bs-toggle="modal"
+              data-bs-target="#viewModal"
+              (click)="selectUser(item)"
+            >
+              <i class="bi bi-eye"></i>
+            </button>
+
+            <!-- <button
+              type="button"
+              class="btn btn-danger delbtn"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal"
+              (click)="selectUser(item)"
+            >
+              <i class="bi bi-trash"></i>
+            </button> -->
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <nav
+    class="pagination-container d-flex align-items-baseline gap-5"
+    aria-label="Page navigation example"
+  >
+    <div class="pagination-info">
+      <span>Total Items: {{ totalItems }} </span
+      ><span>Page Size: {{ pageSize }} </span>
+    </div>
+
+    <ul class="pagination d-flex gap-3">
+      <div class="d-flex">
+        <li
+          class="page-item"
+          [class.disabled]="page === 1"
+          (click)="this.page !== 1 && previousPage()"
+        >
+          <a class="page-link" aria-label="Previous">
+            <span aria-hidden="true"> &laquo; Previous</span>
+          </a>
+        </li>
+        <li class="page-item" *ngFor="let p of pages" (click)="setPage(p)">
+          <a class="page-link" [ngClass]="{ 'active-page': p === page }">{{
+            p
+          }}</a>
+        </li>
+
+        <li
+          class="page-item"
+          [class.disabled]="page === totalPages"
+          (click)="this.page !== totalPages && nextPage()"
+        >
+          <a class="page-link" aria-label="Next">
+            <span aria-hidden="true">Next &raquo;</span>
+          </a>
+        </li>
+      </div>
+    </ul>
+  </nav>
+</div>
+<!-- create employee Modal -->
+<form #f="ngForm" (ngSubmit)="submitForm()" novalidate>
+  <div
+    class="modal fade"
+    id="staticBackdrop"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div
+      class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable static"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">
+            Provide Employee Details
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            data-bs-dismiss="modal"
+            (click)="f.reset()"
+            (click)="test2()"
+            (click)="revert()"
+          ></button>
+        </div>
+        <div class="error-msg" [hidden]="toggleError">{{ errorMsg }}</div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="firstName" class="form-label"
+                  >First Name <span class="red">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="firstName"
+                  name="firstName"
+                  required
+                  ngModel
+                  #firstName="ngModel"
+                  (ngModelChange)="test($event, 'firstName')"
+                  maxlength="30"
+                />
+                <div>
+                  <div
+                    *ngIf="firstName.invalid && firstName.touched"
+                    class="text-danger"
+                  >
+                    First Name is required.
+                  </div>
+
+                  <div
+                    class="text-danger"
+                    [hidden]="firstName.invalid"
+                    *ngIf="!firstnameValid"
+                  >
+                    First Name should contain only characters
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="lastName" class="form-label"
+                  >Last Name <span class="red">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="lastName"
+                  name="lastName"
+                  #lastName="ngModel"
+                  required
+                  ngModel
+                  (ngModelChange)="test($event, 'lastName')"
+                  maxlength="30"
+                />
+                <div>
+                  <div
+                    *ngIf="lastName.invalid && lastName.touched"
+                    class="text-danger"
+                  >
+                    Last Name is required.
+                  </div>
+
+                  <div
+                    class="text-danger"
+                    [hidden]="lastName.invalid"
+                    *ngIf="!lastnameValid"
+                  >
+                    Last Name should contain only characters
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="phoneNo" class="form-label">Phone No</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="phoneNo"
+                  name="mobileNo"
+                  required
+                  ngModel
+                  maxlength="10"
+                  #mobile="ngModel"
+                  (ngModelChange)="test($event, 'mobile')"
+                />
+
+                <div *ngIf="!mobileValid" class="text-danger">
+                  Mobile number must be 10 digits long.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="dob" class="form-label"
+                  >Date of Birth <span class="red">*</span></label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  id="dob"
+                  name="dob"
+                  required
+                  ngModel
+                  #dob="ngModel"
+                  (ngModelChange)="test($event, 'dob')"
+                />
+                <div>
+                  <div *ngIf="dob.invalid && dob.touched" class="text-danger">
+                    DOB is required
+                  </div>
+
+                  <div
+                    class="text-danger"
+                    [hidden]="dob.invalid"
+                    *ngIf="!dobValid"
+                  >
+                    Age should be between 18 and 60 years.
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="personalEmail" class="form-label"
+                  >Personal Email <span class="red">*</span></label
+                >
+                <input
+                  type="email"
+                  class="form-control"
+                  id="personalEmail"
+                  name="personalEmail"
+                  required
+                  ngModel
+                  #email="ngModel"
+                  (ngModelChange)="test($event, 'email')"
+                  maxlength="60"
+                />
+                <div>
+                  <div
+                    *ngIf="email.invalid && email.touched"
+                    class="text-danger"
+                  >
+                    Email is Required
+                  </div>
+
+                  <div
+                    class="text-danger"
+                    [hidden]="email.invalid"
+                    *ngIf="!emailValid"
+                  >
+                    Enter a valid Email Address.
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="companyEmail" class="form-label"
+                  >Company Email</label
+                >
+                <input
+                  type="email"
+                  class="form-control"
+                  id="companyEmail"
+                  name="companyEmail"
+                  ngModel
+                  maxlength="60"
+                  #cemail="ngModel"
+                  (ngModelChange)="test($event, 'cemail')"
+                />
+
+                <div
+                  class="text-danger"
+                  [hidden]="cemail.invalid"
+                  *ngIf="!cemailValid"
+                >
+                  Enter a valid Email Address.
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="gender" class="form-label"
+                  >Gender <span class="red">*</span></label
+                >
+                <div class="radio-options">
+                  <div>
+                    <input
+                      type="radio"
+                      id="male"
+                      name="gender"
+                      value="MALE"
+                      class="radio-option"
+                      required
+                      ngModel
+                      (input)="test($event, 'gender')"
+                    />
+                    <label for="male">Male</label>
+                  </div>
+                  <div>
+                    <input
+                      type="radio"
+                      id="female"
+                      name="gender"
+                      value="FEMALE"
+                      required
+                      ngModel
+                      (input)="test($event, 'gender')"
+                    />
+                    <label for="female">Female</label>
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="street" class="form-label">Street</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="street"
+                  name="street"
+                  required
+                  ngModel
+                  (ngModelChange)="test($event, 'street')"
+                  maxlength="70"
+                />
+
+                <div class="text-danger" [hidden]="streetValid">
+                  Special characters not allowed.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="city" class="form-label">City</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="city"
+                  name="city"
+                  required
+                  ngModel
+                  #city="ngModel"
+                  (ngModelChange)="test($event, 'city')"
+                  maxlength="30"
+                />
+
+                <div class="text-danger" [hidden]="cityValid">
+                  Special characters not allowed.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="pincode " class="form-label">Pincode</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="pincode"
+                  name="pincode"
+                  required
+                  maxlength="8"
+                  (ngModelChange)="test($event, 'pincode')"
+                />
+                <div *ngIf="!pincodeValid" class="text-danger">
+                  Enter Valid Pincode
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="state" class="form-label">State</label>
+                <select
+                  class="form-select"
+                  id="state"
+                  name="state"
+                  required
+                  ngModel
+                >
+                  <option value="Andaman and Nicobar Islands">
+                    Andaman and Nicobar Islands
+                  </option>
+                  <option value="Andhra Pradesh">Andhra Pradesh</option>
+                  <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                  <option value="Assam">Assam</option>
+                  <option value="Bihar">Bihar</option>
+                  <option value="Chandigarh">Chandigarh</option>
+                  <option value="Chhattisgarh">Chhattisgarh</option>
+                  <option value="Dadra and Nagar Haveli">
+                    Dadra and Nagar Haveli
+                  </option>
+                  <option value="Daman and Diu">Daman and Diu</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Goa">Goa</option>
+                  <option value="Gujarat">Gujarat</option>
+                  <option value="Haryana">Haryana</option>
+                  <option value="Himachal Pradesh">Himachal Pradesh</option>
+                  <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                  <option value="Jharkhand">Jharkhand</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Kerala">Kerala</option>
+                  <option value="Ladakh">Ladakh</option>
+                  <option value="Lakshadweep">Lakshadweep</option>
+                  <option value="Madhya Pradesh">Madhya Pradesh</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Manipur">Manipur</option>
+                  <option value="Meghalaya">Meghalaya</option>
+                  <option value="Mizoram">Mizoram</option>
+                  <option value="Nagaland">Nagaland</option>
+                  <option value="Odisha">Odisha</option>
+                  <option value="Puducherry">Puducherry</option>
+                  <option value="Punjab">Punjab</option>
+                  <option value="Rajasthan">Rajasthan</option>
+                  <option value="Sikkim">Sikkim</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Telangana">Telangana</option>
+                  <option value="Tripura">Tripura</option>
+                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  <option value="Uttarakhand">Uttarakhand</option>
+                  <option value="West Bengal">West Bengal</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="joiningDate" class="form-label"
+                  >Joining Date <span class="red">*</span></label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  id="joiningDate"
+                  name="joiningDate"
+                  required
+                  ngModel
+                  #joiningDate="ngModel"
+                  (ngModelChange)="test($event, 'joiningDate')"
+                />
+
+                <div>
+                  <div
+                    *ngIf="joiningDate.invalid && joiningDate.touched"
+                    class="text-danger"
+                  >
+                    Joining Date is required
+                  </div>
+
+                  <div
+                    class="text-danger"
+                    [hidden]="joiningDate.invalid"
+                    *ngIf="!joiningDatevalid"
+                  >
+                    Joining date should be within 1 year forward and backward
+                    from the current date
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="paygrade" class="form-label">Designation</label>
+                <select
+                  class="form-select"
+                  id="designation"
+                  name="designation"
+                  ngModel
+                >
+                  <option selected value="">Select Designation</option>
+
+                  <option *ngFor="let des of desData" [value]="des.title">
+                    {{ des.title }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="additionalInput1" class="form-label"
+                  >Department</label
+                >
+                <select
+                  class="form-select"
+                  id="department"
+                  name="department"
+                  ngModel
+                >
+                  <option selected value="">Select department</option>
+
+                  <option *ngFor="let dept of deptData" [value]="dept.name">
+                    {{ dept.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="project" class="form-label">Project</label>
+                <select class="form-select" id="project" name="project" ngModel>
+                  <option selected value="">Select Project</option>
+
+                  <option
+                    *ngFor="let project of projectData"
+                    [value]="project.projectTitle"
+                  >
+                    {{ project.projectTitle }}
+                  </option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="paygrade" class="form-label">Paygrade</label>
+                <select
+                  class="form-select"
+                  id="paygrade"
+                  name="paygrade"
+                  ngModel
+                >
+                  <option selected value="">Select Paygrade</option>
+
+                  <option
+                    *ngFor="let paygrade of paygradeData"
+                    [value]="paygrade.paygradeName"
+                  >
+                    {{ paygrade.paygradeName }}
+                  </option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="additionalInput3" class="form-label"
+                  >Access Level <span class="red">*</span></label
+                >
+                <select
+                  class="form-select"
+                  id="additionalInput3"
+                  name="role"
+                  ngModel
+                  (ngModelChange)="test($event, 'role')"
+                >
+                  <option selected value="ROLE_EMPLOYEE">Employee</option>
+                  <option [hidden]="currId != 100" value="ROLE_HR">HR</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="formFile" class="form-label">Profile Photo</label>
+                <input
+                  class="form-control"
+                  name="profile-img"
+                  type="file"
+                  id="profile-img"
+                  (change)="onFileSelected($event)"
+                />
+                <div *ngIf="fileSizeError" class="text-danger">
+                  File size exceeds the limit (1 MB).
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-center">
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="
+              requiredFieldCheck ||
+              ((!firstnameValid ||
+                !lastnameValid ||
+                !emailValid ||
+                !dobValid ||
+                !genderValid ||
+                !joiningDatevalid ||
+                !roleValid) &&
+                cemailValid &&
+                mobileValid &&
+                cityValid &&
+                streetValid &&
+                pincodeValid)
+            "
+          >
+            Submit
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+            (click)="f.reset()"
+            id="createbtn"
+            (click)="test2()"
+            (click)="revert()"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!--Delete Modal -->
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div
+    class="modal-dialog modal-dialog-centered modal-dialog-scrollable static"
+  >
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">
+          Do you wish to delete this record?
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        Name: {{ userData.firstName + " " + userData.lastName }} EmpID:
+        {{ userData.empID }}
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          id="delbtn"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="deleteUser(userData.empID)"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Edit Modal -->
+<form #df="ngForm" (ngSubmit)="editEmployee()">
+  <div
+    class="modal fade"
+    id="viewModal"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div
+      class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable static"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">
+            View/Edit Record
+          </h1>
+
+          <div
+            class="alert alert-danger"
+            role="alert"
+            *ngIf="userData.role === 'ROLE_HR' && currId != 100"
+          >
+            Only 'Root HR' can manage other HR's
+          </div>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            (click)="revert(); reset()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="firstName" class="form-label"
+                  >First Name <span class="red">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="firstName"
+                  name="firstName"
+                  [(ngModel)]="editData.firstName"
+                  #firstame="ngModel"
+                  (ngModelChange)="test($event, 'firstName')"
+                  maxlength="30"
+                  required
+                />
+                <div>
+                  <div
+                    *ngIf="firstame.invalid && firstame.dirty"
+                    class="text-danger"
+                  >
+                    First Name is required.
+                  </div>
+
+                  <div
+                    class="text-danger"
+                    [hidden]="firstame.invalid"
+                    *ngIf="!firstnameValid"
+                  >
+                    First Name should contain only characters
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="lastName" class="form-label">Last Name </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="lastName"
+                  name="lastName"
+                  required
+                  [(ngModel)]="editData.lastName"
+                  #lastNamer="ngModel"
+                  (ngModelChange)="test($event, 'lastName')"
+                  maxlength="30"
+                />
+                <div>
+                  <div
+                    *ngIf="lastNamer.invalid && lastNamer.dirty"
+                    class="text-danger"
+                  >
+                    Last Name is required.
+                  </div>
+
+                  <div
+                    class="text-danger"
+                    [hidden]="lastNamer.invalid"
+                    *ngIf="!lastnameValid"
+                  >
+                    Last Name should contain only characters
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="phoneNo" class="form-label">Phone No</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="phoneNo"
+                  name="mobileNo"
+                  required
+                  [(ngModel)]="editData.mobileNo"
+                  #mobile="ngModel"
+                  (ngModelChange)="test($event, 'mobile')"
+                />
+                <div *ngIf="!mobileValid" class="text-danger">
+                  Mobile number must be 10 digits long.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="dob" class="form-label"
+                  >Date of Birth <span class="red">*</span></label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  id="dob"
+                  name="dob"
+                  [(ngModel)]="editData.dob"
+                  #dobr="ngModel"
+                  (ngModelChange)="test($event, 'dob')"
+                />
+                <div>
+                  <div *ngIf="dobr.invalid && dobr.touched" class="text-danger">
+                    DOB is required
+                  </div>
+
+                  <div
+                    class="text-danger"
+                    [hidden]="dobr.invalid"
+                    *ngIf="!dobValid"
+                  >
+                    Age should be between 18 and 60 years.
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="personalEmail" class="form-label"
+                  >Personal Email <span class="red">*</span></label
+                >
+                <input
+                  type="email"
+                  class="form-control"
+                  id="personalEmail"
+                  name="personalEmail"
+                  [(ngModel)]="editData.personalEmail"
+                  #emailr="ngModel"
+                  (ngModelChange)="test($event, 'email')"
+                  maxlength="60"
+                  required
+                />
+                <div>
+                  <div
+                    *ngIf="emailr.invalid && emailr.dirty"
+                    class="text-danger"
+                  >
+                    Email is Required
+                  </div>
+
+                  <div
+                    class="text-danger"
+                    [hidden]="emailr.invalid"
+                    *ngIf="!emailValid"
+                  >
+                    Enter a valid Email Address.
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="companyEmail" class="form-label"
+                  >Company Email</label
+                >
+                <input
+                  type="email"
+                  class="form-control"
+                  id="companyEmail"
+                  name="companyEmail"
+                  required
+                  [(ngModel)]="editData.companyEmail"
+                  #cemailr="ngModel"
+                  (ngModelChange)="test($event, 'cemail')"
+                  maxlength="60"
+                />
+
+                <div class="text-danger" [hidden]="cemailValid">
+                  Enter a valid Email Address.
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="gender" class="form-label">Gender </label>
+                <div class="radio-options">
+                  <div>
+                    <input
+                      type="radio"
+                      id="MALE"
+                      name="gender"
+                      value="MALE"
+                      class="radio-option"
+                      [(ngModel)]="editData.gender"
+                    />
+                    <label for="MALE"> Male</label>
+                  </div>
+                  <div>
+                    <input
+                      type="radio"
+                      id="FEMALE"
+                      name="gender"
+                      value="FEMALE"
+                      required
+                      [(ngModel)]="editData.gender"
+                      [checked]="userData.gender === 'FEMALE'"
+                    />
+                    <label for="FEMALE">Female</label>
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="street" class="form-label">Street</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="street1"
+                  name="street"
+                  required
+                  [(ngModel)]="editData.street"
+                  (ngModelChange)="test($event, 'street')"
+                  maxlength="30"
+                />
+
+                <div class="text-danger" [hidden]="streetValid">
+                  Special characters not allowed.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="city" class="form-label">City</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="city"
+                  name="city"
+                  [(ngModel)]="editData.city"
+                  (ngModelChange)="test($event, 'city')"
+                  maxlength="30"
+                />
+                <div class="text-danger" [hidden]="cityValid">
+                  Special characters not allowed.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="pincode " class="form-label">Pincode</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="pincode"
+                  name="pincode"
+                  required
+                  [(ngModel)]="editData.pincode"
+                  (ngModelChange)="test($event, 'pincode')"
+                />
+                <div *ngIf="!pincodeValid" class="text-danger">
+                  Enter Valid Pincode
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="state" class="form-label">State</label>
+                <select
+                  class="form-select"
+                  id="state"
+                  name="state"
+                  [(ngModel)]="editData.state"
+                >
+                  <option value="Andaman and Nicobar Islands">
+                    Andaman and Nicobar Islands
+                  </option>
+                  <option value="Andhra Pradesh">Andhra Pradesh</option>
+                  <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                  <option value="Assam">Assam</option>
+                  <option value="Bihar">Bihar</option>
+                  <option value="Chandigarh">Chandigarh</option>
+                  <option value="Chhattisgarh">Chhattisgarh</option>
+                  <option value="Dadra and Nagar Haveli">
+                    Dadra and Nagar Haveli
+                  </option>
+                  <option value="Daman and Diu">Daman and Diu</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Goa">Goa</option>
+                  <option value="Gujarat">Gujarat</option>
+                  <option value="Haryana">Haryana</option>
+                  <option value="Himachal Pradesh">Himachal Pradesh</option>
+                  <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                  <option value="Jharkhand">Jharkhand</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Kerala">Kerala</option>
+                  <option value="Ladakh">Ladakh</option>
+                  <option value="Lakshadweep">Lakshadweep</option>
+                  <option value="Madhya Pradesh">Madhya Pradesh</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Manipur">Manipur</option>
+                  <option value="Meghalaya">Meghalaya</option>
+                  <option value="Mizoram">Mizoram</option>
+                  <option value="Nagaland">Nagaland</option>
+                  <option value="Odisha">Odisha</option>
+                  <option value="Puducherry">Puducherry</option>
+                  <option value="Punjab">Punjab</option>
+                  <option value="Rajasthan">Rajasthan</option>
+                  <option value="Sikkim">Sikkim</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Telangana">Telangana</option>
+                  <option value="Tripura">Tripura</option>
+                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  <option value="Uttarakhand">Uttarakhand</option>
+                  <option value="West Bengal">West Bengal</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="joiningDate" class="form-label">Joining Date</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="joiningDate"
+                  name="joiningDate"
+                  [(ngModel)]="editData.joiningDate"
+                  #joiningDater="ngModel"
+                  (ngModelChange)="test($event, 'joiningDate')"
+                />
+                <div>
+                  <div
+                    *ngIf="joiningDater.invalid && joiningDater.dirty"
+                    class="text-danger"
+                  >
+                    Joining Date is required
+                  </div>
+
+                  <div
+                    class="text-danger"
+                    [hidden]="joiningDater.invalid"
+                    *ngIf="!joiningDatevalid"
+                  >
+                    Joining date should be within 1 year forward and backward
+                    from the current date
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="designation" class="form-label">Designation</label>
+                <select
+                  class="form-select"
+                  id="designation"
+                  name="designation"
+                  [(ngModel)]="editData.designation"
+                >
+                  <option
+                    *ngIf="desgnName.length != 0"
+                    selected
+                    value="{{ desgnName }}"
+                  >
+                    {{ desgnName }}
+                  </option>
+                  <option *ngIf="desgnName.length == 0" selected value="">
+                    Select Designation
+                  </option>
+                  <option
+                    id="selectbtn"
+                    *ngFor="let des of desData"
+                    value="{{ des.title }}"
+                  >
+                    {{
+                      desgnName.length == 0
+                        ? des.title
+                        : des.title != desgnName
+                        ? des.title
+                        : "Select Designation"
+                    }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="additionalInput1" class="form-label"
+                  >Department</label
+                >
+                <select
+                  class="form-select"
+                  id="department"
+                  name="department"
+                  [(ngModel)]="editData.department"
+                >
+                  <option
+                    *ngIf="deptName.length != 0"
+                    selected
+                    value="{{ deptName }}"
+                  >
+                    {{ deptName }}
+                  </option>
+                  <option *ngIf="deptName.length == 0" selected value="">
+                    Select Department
+                  </option>
+                  <option
+                    id="selectbtn"
+                    *ngFor="let dept of deptData"
+                    value="{{ dept.name }}"
+                  >
+                    {{
+                      deptName.length == 0
+                        ? dept.name
+                        : dept.name != deptName
+                        ? dept.name
+                        : "Select Department"
+                    }}
+                  </option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="project" class="form-label">Project</label>
+                <select
+                  class="form-select"
+                  id="project"
+                  name="project"
+                  [(ngModel)]="editData.project"
+                >
+                  <option
+                    *ngIf="projectName.length != 0"
+                    selected
+                    value="{{ projectName }}"
+                  >
+                    {{ projectName }}
+                  </option>
+                  <option *ngIf="projectName.length == 0" selected value="">
+                    Select Project
+                  </option>
+                  <option
+                    id="selectbtn"
+                    *ngFor="let project of projectData"
+                    value="{{ project.projectTitle }}"
+                  >
+                    {{
+                      projectName.length == 0
+                        ? project.projectTitle
+                        : project.projectTitle != projectName
+                        ? project.projectTitle
+                        : "Select Project"
+                    }}
+                  </option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="paygrade" class="form-label">Paygrade</label>
+                <select
+                  class="form-select"
+                  id="paygrade"
+                  name="paygrade"
+                  [(ngModel)]="editData.paygrade"
+                >
+                  <option
+                    *ngIf="payName.length != 0"
+                    selected
+                    value="{{ payName }}"
+                  >
+                    {{ payName }}
+                  </option>
+                  <option *ngIf="payName.length == 0" selected value="">
+                    Select PayGrade
+                  </option>
+                  <option
+                    id="selectbtn"
+                    *ngFor="let paygrade of paygradeData"
+                    value="{{ paygrade.paygradeName }}"
+                  >
+                    {{
+                      payName.length == 0
+                        ? paygrade.paygradeName
+                        : paygrade.paygradeName != payName
+                        ? paygrade.paygradeName
+                        : "Select Paygrade"
+                    }}
+                  </option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="additionalInput3" class="form-label"
+                  >Access Level</label
+                >
+                <select
+                  class="form-select"
+                  id="additionalInput3"
+                  name="role"
+                  [(ngModel)]="editData.role"
+                  [disabled]="
+                    editData.empID === 100 ||
+                    (currId != 100 && editData.role === 'ROLE_EMPLOYEE')
+                  "
+                >
+                  <option value="ROLE_EMPLOYEE">Employee</option>
+                  <option value="ROLE_HR">HR</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select
+                  class="form-select"
+                  id="status"
+                  name="status"
+                  [(ngModel)]="editData.status"
+                  [disabled]="editData.empID === 100"
+                >
+                  <option selected value="">Select Status</option>
+                  <option value="ACTIVE">ACTIVE</option>
+                  <option value="RETIRE">RETIRE</option>
+                  <option value="RESIGN">RESIGN</option>
+                  <option value="LAYOFF">LAYOFF</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              id="close-edit-btn"
+              (click)="revert(); reset()"
+            >
+              Close
+            </button>
+            <button
+              type="submit"
+              class="btn btn-success"
+              [disabled]="
+                x ||
+                (firstame.dirty && firstame.invalid) ||
+                (lastNamer.dirty && lastNamer.invalid) ||
+                (emailr.dirty && emailr.invalid)
+              "
+              (click)="revert()"
+            >
+              Update
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+<!-- Button trigger modal -->
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="designationBackdrop"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">
+          Create a Designation
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="desig-container">
+          <div class="left-side">
+            <form
+              df="ngForm"
+              ngNativeValidate
+              (ngSubmit)="createDesig()"
+              id="specForm"
+            >
+              <div class="form-group group">
+                <label for="name">Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="name"
+                  name="name"
+                  [(ngModel)]="designation.title"
+                  required
+                />
+              </div>
+              <div class="form-group group">
+                <label for="desc">Description</label>
+                <textarea
+                  id="desc"
+                  name="desc"
+                  class="form-control"
+                  rows="4"
+                  maxlength="250"
+                  [(ngModel)]="designation.description"
+                  required
+                ></textarea>
+                <small class="form-text text-muted">
+                  Max 250 characters.
+                </small>
+              </div>
+              <button type="submit" class="btn btn-success">Create</button>
+            </form>
+          </div>
+        </div>
+        <!-- <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button type="button" class="btn btn-primary">Understood</button>
+        </div> -->
+      </div>
+    </div>
+  </div>
+</div>

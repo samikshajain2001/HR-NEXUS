@@ -1,0 +1,50 @@
+<div class="main-container">
+  <div class="dashboard">
+    <div class="left-side">
+      <div class="first-line">
+        <div class="hi-txt">Hi, {{ firstName | titlecase }}</div>
+        <div class="quote">
+          “The future depends on what you do today.” - Mahatma Gandhi
+        </div>
+      </div>
+      <div class="second-line">
+        <div class="info-card">
+          <div class="metric">Active Employees</div>
+          <div class="val">{{ totalEmployees }}</div>
+          <div class="label">Employees</div>
+        </div>
+        <div class="info-card">
+          <div class="metric">Total Departments</div>
+          <div class="val">{{ totalDepts }}</div>
+          <div class="label">Departments</div>
+        </div>
+        <div class="info-card">
+          <div class="metric">Ongoing Projects</div>
+          <div class="val">{{ totalProjects }}</div>
+          <div class="label">Projects</div>
+        </div>
+      </div>
+      <div class="third-line">
+        <div class="graph-box">
+          <canvas id="deptChart"></canvas>
+        </div>
+        <div class="graph-box"><canvas id="desigChart"></canvas></div>
+      </div>
+      <div class="fourth-line">
+        <div class="events-card"><canvas id="lineChart"></canvas></div>
+      </div>
+    </div>
+    <div class="right-side">
+      <div class="holiday-card">
+        <canvas id="genderChart" width="195" height="190"></canvas>
+      </div>
+
+      <mat-card class="demo-inline-calendar-card">
+        <mat-calendar
+          class="mat-calendar"
+          [(selected)]="selected"
+        ></mat-calendar>
+      </mat-card>
+    </div>
+  </div>
+</div>

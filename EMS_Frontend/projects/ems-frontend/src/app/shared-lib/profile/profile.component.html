@@ -1,0 +1,70 @@
+<div class="main-container">
+  <div class="top-container">
+    <div class="profile-sec">
+      <img
+        src="{{
+          userData?.profileImgUrl
+            ? userData.profileImgUrl
+            : '../../assets/defaultProfile.png'
+        }}"
+        class="card-img-top profile-image"
+        alt="Profile Image"
+      />
+
+      <div class="info-div">
+        <div class="name-div">
+          {{ userData?.firstName + " " + userData.lastName | titlecase }}
+        </div>
+        <div class="title-div">
+          {{ userData.designation?.title }}
+        </div>
+      </div>
+    </div>
+    <div class="phone-sec">
+      <div class="label-txt">Username</div>
+      <div class="label-value">{{ userData?.username }}</div>
+    </div>
+    <div class="email-sec">
+      <div class="label-txt">Official Email</div>
+      <div class="label-value">{{ userData?.companyEmail }}</div>
+    </div>
+    <div class="phone-sec">
+      <div class="label-txt">Mobile Number</div>
+      <div class="label-value">{{ userData?.mobileNo }}</div>
+    </div>
+  </div>
+  <div class="bottom-container">
+    <div class="left-side">
+      <div
+        class="item"
+        routerLink="personalinfo"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{
+          exact: true
+        }"
+      >
+        <div class="content">
+          <span>Personal Details</span>
+        </div>
+      </div>
+      <div class="item" routerLink="departmentinfo" routerLinkActive="active">
+        <div class="content">
+          <span>Department Details</span>
+        </div>
+      </div>
+      <div class="item" routerLink="projectinfo" routerLinkActive="active">
+        <div class="content">
+          <span>Project Details</span>
+        </div>
+      </div>
+      <div class="item" routerLink="paybandinfo" routerLinkActive="active">
+        <div class="content">
+          <span>Payband Details</span>
+        </div>
+      </div>
+    </div>
+    <div class="right-side">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

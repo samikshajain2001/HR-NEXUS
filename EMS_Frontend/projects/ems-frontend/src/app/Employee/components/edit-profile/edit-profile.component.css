@@ -1,0 +1,23 @@
+.main-container {
+  height: 90%;
+  width: 100%;
+  padding: 2rem;
+}
+
+.card {
+  padding: 2rem;
+  margin: 2rem;
+  border: none;
+}
+
+.title-txt {
+  font-size: 2rem;
+}
+.error-msg {
+  color: red;
+  margin-bottom: 1rem;
+}
+.width {
+  width: 30rem;
+  margin-bottom: -2rem;
+}

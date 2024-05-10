@@ -1,0 +1,38 @@
+<div class="main-container">
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="item">
+        <i class="circle"></i>
+
+        <div>Department ID</div>
+        <div>
+          {{ userData.department?.departmentId || "-"}}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="item">
+        <i class="circle"></i>
+
+        <div>Department Name</div>
+        <div>{{ userData.department?.name || "-"}}</div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="item">
+        <i class="circle"></i>
+
+        <div>Department Phone</div>
+        <div>{{ userData.department?.mobileNo|| "-" }}</div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="item">
+        <i class="circle"></i>
+
+        <div>Department Email</div>
+        <div>{{ userData.department?.email|| "-" }}</div>
+      </div>
+    </div>
+  </div>
+</div>

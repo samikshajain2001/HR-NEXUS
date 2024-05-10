@@ -1,0 +1,123 @@
+<div class="main-container">
+  <div class="top-line">
+    <span class="title-txt">Generate Reports</span>
+  </div>
+
+  <div class="select-section">
+    <span>I want information about</span>
+    <select
+      [(ngModel)]="selectedOption"
+      class="form-select"
+      aria-label="Default select example"
+    >
+      <option selected value="">Select an option</option>
+      <option selected value="basic">Overall Organization</option>
+      <option value="employee">Employees</option>
+      <!-- <option value="dep">Departments</option> -->
+      <option value="project">Projects</option>
+    </select>
+  </div>
+
+  <div class="filters-emp" *ngIf="selectedOption === 'employee'">
+    <div>Apply Filters:-</div>
+    <div class="filter-item">
+      <span class="filter-by-txt">Status</span>
+      <select
+        [(ngModel)]="filter.status"
+        class="form-select filter"
+        aria-label="Default select example"
+      >
+        <option selected value="">ALL</option>
+        <option value="RETIRE">RETIRE</option>
+        <option value="RESIGN">RESIGN</option>
+        <option value="LAYOFF">LAYOFF</option>
+        <option value="ACTIVE">ACTIVE</option>
+      </select>
+    </div>
+
+    <div class="filter-item">
+      <span class="filter-by-txt">Department</span>
+      <select
+        [(ngModel)]="filter.deptName"
+        class="form-select filter"
+        aria-label="Default select example"
+      >
+        <option selected value="">ALL</option>
+        <option *ngFor="let dept of deptData" [value]="dept.name">
+          {{ dept.name }}
+        </option>
+      </select>
+    </div>
+    <div class="filter-item">
+      <span class="filter-by-txt">Gender</span>
+      <select
+        [(ngModel)]="filter.gender"
+        class="form-select filter"
+        aria-label="Default select example"
+      >
+        <option selected value="">ALL</option>
+        <option value="MALE">MALE</option>
+        <option value="FEMALE">FEMALE</option>
+      </select>
+    </div>
+    <div class="filter-item">
+      <span class="filter-by-txt">Format</span>
+      <select
+        class="form-select filter"
+        aria-label="Default select example"
+        [(ngModel)]="format"
+      >
+        <option value="pdf" selected>PDF</option>
+        <option value="xlsx">EXCEL</option>
+      </select>
+    </div>
+  </div>
+  <div class="filters-pro" *ngIf="selectedOption === 'project'">
+    <div>Apply Filters:-</div>
+    <div class="filter-item">
+      <span class="filter-by-txt">Status</span>
+      <select
+        [(ngModel)]="filter.status"
+        class="form-select filter"
+        aria-label="Default select example"
+      >
+        <option selected value="">ALL</option>
+        <option value="COMPLETED">COMPLETED</option>
+        <option value="ONGOING">ONGOING</option>
+        <option value="UPCOMING">UPCOMING</option>
+      </select>
+    </div>
+
+    <div class="filter-item">
+      <span class="filter-by-txt">Department</span>
+      <select
+        [(ngModel)]="filter.deptName"
+        class="form-select filter"
+        aria-label="Default select example"
+      >
+        <option selected value="">ALL</option>
+        <option *ngFor="let dept of deptData" [value]="dept.name">
+          {{ dept.name }}
+        </option>
+      </select>
+    </div>
+    <div class="filter-item">
+      <span class="filter-by-txt">Format</span>
+      <select
+        class="form-select filter"
+        aria-label="Default select example"
+        [(ngModel)]="format"
+      >
+        <option value="pdf" selected>PDF</option>
+        <option value="xlsx">EXCEL</option>
+      </select>
+    </div>
+  </div>
+  <div>
+    <div>
+      <button class="btn btn-success gen-btn" (click)="genReport()">
+        Generate Report
+      </button>
+    </div>
+  </div>
+</div>

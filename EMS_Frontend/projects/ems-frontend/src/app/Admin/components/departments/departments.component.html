@@ -1,0 +1,530 @@
+<div class="main-container">
+  <div class="top-bar">
+    <div class="info">
+      <span class="title-txt">List of Departments</span>
+      <button
+        type="button"
+        class="btn btn-success create-btn"
+        data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop"
+      >
+        <i class="bi bi-sliders"></i>
+        Create Department
+      </button>
+    </div>
+    <div class="input-group">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search for an Department"
+        [(ngModel)]="searchQuery"
+        (input)="searchQueryFire()"
+      />
+    </div>
+  </div>
+  <div class="table">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <td>Sort By :</td>
+          <td>
+            <select
+              class="form-select form-select-sm"
+              aria-label="Small select example"
+              [(ngModel)]="sortParam"
+              (ngModelChange)="sortEmp()"
+            >
+              <option value="name asc">Name (Ascending)</option>
+              <option value="name desc">Name (Descending)</option>
+              <option value="departmentId asc">ID (Ascending)</option>
+              <option value="departmentId desc">ID (Descending)</option>
+            </select>
+          </td>
+
+          <td>
+            <button class="btn btn-success" (click)="clearFilter()">
+              <i class="bi bi-arrow-clockwise"></i> Reset
+            </button>
+          </td>
+        </tr>
+        <tr class="header-row">
+          <th scope="col">Sl. No</th>
+          <th scope="col">Dept Id</th>
+          <th scope="col">Name</th>
+          <th scope="col">Email</th>
+          <th scope="col">Mobile No</th>
+          <!-- <th scope="col">No of Employee</th> -->
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody *ngFor="let dept of deptData; let i = index">
+        <tr>
+          <td>{{ calcSlNo(i + 1) }}</td>
+          <td>{{ dept.departmentId }}</td>
+          <td>{{ dept.name }}</td>
+          <td>{{ dept.email }}</td>
+          <td>{{ dept.mobileNo }}</td>
+          <td class="actions-row">
+            <button
+              type="button"
+              class="btn btn-success viewbtn"
+              (click)="viewDeptEmployees(dept)"
+              data-bs-toggle="modal"
+              data-bs-target="#viewDeptBackdrop"
+            >
+              <i class="bi bi-people-fill"></i>
+            </button>
+            <button
+              type="button"
+              class="btn btn-success viewbtn"
+              data-bs-toggle="modal"
+              data-bs-target="#viewModal"
+              (click)="setItem(dept)"
+            >
+              <i class="bi bi-pencil-square"></i>
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-danger delbtn"
+              data-bs-toggle="modal"
+              data-bs-target="#deleteModal"
+              (click)="setItem(dept)"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <nav
+    class="pagination-container d-flex align-items-baseline gap-5"
+    aria-label="Page navigation example"
+  >
+    <div class="pagination-info">
+      <span>Total Items: {{ totalItems }} </span
+      ><span>Page Size: {{ pageSize }} </span>
+    </div>
+
+    <ul class="pagination d-flex gap-3">
+      <div class="d-flex">
+        <li class="page-item" [class.disabled]="page == 1">
+          <a class="page-link" aria-label="Previous">
+            <span aria-hidden="true" (click)="previousPage()">
+              &laquo; Previous</span
+            >
+          </a>
+        </li>
+        <li class="page-item" *ngFor="let p of pages">
+          <a
+            class="page-link"
+            [ngClass]="{ 'active-page': p === page }"
+            (click)="getCurrPageData(p)"
+            >{{ p }}</a
+          >
+        </li>
+
+        <li class="page-item" [class.disabled]="page === totalPages">
+          <a class="page-link" aria-label="Next">
+            <span aria-hidden="true" (click)="nextPage()">Next &raquo;</span>
+          </a>
+        </li>
+      </div>
+    </ul>
+  </nav>
+</div>
+<!-- Create Department Modal -->
+<form #f="ngForm" (ngSubmit)="submitForm()">
+  <div
+    class="modal fade"
+    id="staticBackdrop"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div
+      class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable static"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">
+            Provide Department Details
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            data-bs-dismiss="modal"
+            (click)="f.reset(); createResetFields()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="firstName" class="form-label"
+                  >Name<span class="red">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nameCreate"
+                  name="name"
+                  #nameCreate="ngModel"
+                  required
+                  ngModel
+                  maxlength="30"
+                  (ngModelChange)="validateInput($event, 'name')"
+                />
+                <div
+                  *ngIf="
+                    nameCreate.invalid &&
+                    (nameCreate.dirty || nameCreate.touched)
+                  "
+                  class="text-danger"
+                >
+                  Name Cannot Be Empty
+                </div>
+                <div class="text-danger" *ngIf="invalidNameCharacters">
+                  Please avoid using special characters
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label"
+                  >Email <span class="red">*</span></label
+                >
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                  ngModel
+                  #email="ngModel"
+                  required
+                  maxlength="60"
+                  (ngModelChange)="validateInput($event, 'email')"
+                />
+                <div
+                  [hidden]="invalidEmailCharacters || emailInvalid"
+                  *ngIf="email.invalid && (email.dirty || email.touched)"
+                  class="text-danger"
+                ></div>
+                <div class="text-danger" *ngIf="invalidEmailCharacters">
+                  Please avoid using special characters
+                </div>
+                <div class="text-danger" *ngIf="emailInvalid">
+                  Invalid Email Format
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="personalEmail" class="form-label"
+                  >Mobile <span class="red">*</span></label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  id="mobile"
+                  name="mobileNo"
+                  required
+                  ngModel
+                  maxlength="10"
+                  #mobile="ngModel"
+                  (ngModelChange)="validateInput($event, 'mobile')"
+                />
+                <div
+                  *ngIf="mobile.invalid && (mobile.dirty || mobile.touched)"
+                  class="text-danger"
+                >
+                  Mobile Cannot be Empty
+                </div>
+                <div *ngIf="invalidMobile" class="text-danger">
+                  Mobile number must be 10 digits long.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-center">
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="
+              f.invalid ||
+              invalidEmailCharacters ||
+              invalidMobile ||
+              invalidNameCharacters ||
+              emailInvalid
+            "
+          >
+            Submit
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+            (click)="f.reset(); createResetFields()"
+            id="createbtn"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!--Delete Modal -->
+<div
+  class="modal fade"
+  id="deleteModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div
+    class="modal-dialog modal-dialog-centered modal-dialog-scrollable static"
+  >
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">
+          Do you wish to delete this record?
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        Name: {{ selectedDept.name }} deptId:
+        {{ selectedDept.departmentId }}
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          id="delbtn"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="deleteDept(selectedDept.departmentId)"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--View Modal -->
+<form #edit="ngForm" (ngSubmit)="editForm()">
+  <div
+    class="modal fade"
+    id="viewModal"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+  >
+    <div
+      class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable static"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">
+            View/Edit Record
+          </h1>
+
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            (click)="resetFields()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="firstName" class="form-label"
+                  >Name <span class="red">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nameEdit"
+                  name="name"
+                  value="{{ selectedDept.name }}"
+                  ngModel
+                  maxlength="40"
+                  #nameEdit="ngModel"
+                  required
+                  (ngModelChange)="validateInput($event, 'name')"
+                />
+                <div
+                  *ngIf="nameEdit.invalid && nameEdit.dirty"
+                  class="text-danger"
+                >
+                  Name Cannot be Empty
+                </div>
+                <div *ngIf="invalidNameCharacters" class="text-danger">
+                  Name Invalid
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="emailEdit"
+                  name="email"
+                  value="{{ selectedDept.email }}"
+                  ngModel
+                  maxlength="60"
+                  #emailEdit="ngModel"
+                  required
+                  (ngModelChange)="validateInput($event, 'email')"
+                />
+                <div
+                  [hidden]="invalidEmailCharacters || emailInvalid"
+                  *ngIf="emailEdit.invalid && emailEdit.dirty"
+                  class="text-danger"
+                >
+                  Email Cannot be Empty
+                </div>
+                <div
+                  *ngIf="invalidEmailCharacters || emailInvalid"
+                  class="text-danger"
+                >
+                  Email Invalid
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="street" class="form-label">Mobile</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="mobileEdit"
+                  name="mobileNo"
+                  value="{{ selectedDept.mobileNo }}"
+                  ngModel
+                  #mobileEdit="ngModel"
+                  required
+                  (ngModelChange)="validateInput($event, 'mobile')"
+                />
+                <div
+                  *ngIf="mobileEdit.invalid && mobileEdit.dirty"
+                  class="text-danger"
+                >
+                  Mobile Cannot be Empty
+                </div>
+                <div *ngIf="invalidMobile" class="text-danger">
+                  Mobile number must be 10 digits long.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            id="editbtn"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+            (click)="resetFields()"
+          >
+            Close
+          </button>
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="
+              editBtnDisabled ||
+              (nameEdit.dirty && nameEdit.invalid) ||
+              (mobileEdit.dirty && mobileEdit.invalid) ||
+              (mobileEdit.dirty && mobileEdit.invalid)
+            "
+          >
+            Update
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="viewDeptBackdrop"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">
+          {{ selectedDept.name }} Department
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>Total Employees - {{ deptEmployeeCount }}</p>
+        <div class="table-container">
+          <table class="table table-borderless">
+            <thead>
+              <tr>
+                <th>Sl. No</th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Company Email</th>
+                <th>Mobile No</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of deptEmployeeData; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.empID || "-" }}</td>
+
+                <td>
+                  {{ (item.firstName || "-") + " " + (item.lastName || "-") }}
+                </td>
+                <td>{{ item.gender || "-" }}</td>
+                <td>{{ item.companyEmail || "-" }}</td>
+                <td>{{ item.mobileNo || "-" }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
